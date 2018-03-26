@@ -10,36 +10,41 @@
 #' testModelFrame <- model.frame(admit ~ gre + gpa + rank, testData)
 #' MLE(X = model.matrix(testModell, testModelFrame), y = model.response(testModelFrame))
 #' @export
-MLE <- function(y, X, tolerance = 1e-5, epsilon = 1e-10, iterMax = 1e3) {
+MLE <- function(y, X, tolerance = 1e-14, epsilon = 1e-10, iterMax = 1000) {
 
-  #  initialisation
+  #  Newton Raphson Method
   beta <- rep(0, times = ncol(X))
-  # init ... #todo: what is M?
-
-  # Newton Raphson Method
-  i <- 1
-  while (epsilon > tolerance & i < iterMax) {
+  i <- 0
+  convergence <- FALSE
+  while (i <= iterMax & convergence == FALSE) { # epsilon > tolerance &
 
     # p := probabilities
+    eta <- X %*% beta
     p <- as.numeric(logist(X %*% beta))
 
     # aktualisiere ...
     M <- diag(p * (1 - p))
 
     # calculate and update beta
-    beta_change <- solve(t(X) %*% M %*% X) %*% t(X) %*% (y - p)
-    beta <- beta + beta_change
+    deltaBeta <- solve(t(X) %*% M %*% X) %*% t(X) %*% (y - p)
+    beta <- beta + deltaBeta
 
-    # berechne die totale Änderung von Beta
-    epsilon <- sum(abs(beta_change))
-
-    # nächste Iteration
+    # update epsilon and i
+    epsilon <- sum(abs(deltaBeta))
     i <- i + 1
-  }
 
+    # check non-convergence condition
+    if (epsilon < tolerance) {
+      convergence <- TRUE
+      break
+    }
+  }
+  if (convergence == FALSE) {
+    stop(paste(i, "iterations reached: Lack of convergence"))
+  }
   # DF := Nr. Observations - Nr. Parameters
-  dfRes <- nrow(X) - ncol(X)  # DF
-  dfNull <- nrow(X) - 1       # Df of Null Model
+  dfRes <- nrow(X) - ncol(X)  # DF Residual Modell
+  dfNull <- nrow(X) - 1       # DF Null Modell
 
   # Kovarianzmatrix
   vcov <- solve(t(X) %*% M %*% X)
@@ -49,12 +54,14 @@ MLE <- function(y, X, tolerance = 1e-5, epsilon = 1e-10, iterMax = 1e3) {
   s[s == 0] = -1
   devianceResidual = as.numeric(s * sqrt(-2*((y * eta) - (log(1 + exp(eta))))))
 
+  #https://onlinecourses.science.psu.edu/stat504/node/62
+
   # Maximumwert der Log Likelihood Funktion
   maxLogLikeValue <- (sum((y * X %*% beta) - (log(1 + exp(X %*% beta)))))
 
   # Fitted Values
   fittedWerte <- p
-  M <- M
+  M <- M # TODO: whats is this?
 
   # Liste der zurückgegebenen Werte
   result <- list(coefficients = beta,
@@ -64,14 +71,15 @@ MLE <- function(y, X, tolerance = 1e-5, epsilon = 1e-10, iterMax = 1e3) {
                  dfNull = dfNull,
                  maxLogLikeValue = maxLogLikeValue,
                  fittedWerte = fittedWerte,
-                 M = M)
+                 M = M,
 
+                 iterCount = i)
   return(result)
 
 }
 
 ## Helper Functions
-logist <- function(eta) return(exp(eta) / 1 + exp(eta))
+logist <- function(eta) return(exp(eta) / (1 + exp(eta)))
 
 
 #' @title Interface for an alternative logistic regression implementation
@@ -90,10 +98,12 @@ logist <- function(eta) return(exp(eta) / 1 + exp(eta))
 #' @export
 logitMod <- function(formula, data) {
 
-  # initialisiere y (Zielvariable) und X (Matrix enthält alle erklärenden Variablen)
+  # generate model.frame, extract design matrix (X) and response var (y)
   modelFrame <- model.frame(formula, data)
   X <- model.matrix(formula, modelFrame)
   y <- model.response(modelFrame)
+
+  # TODO: sanity checks
 
   # falls y nicht als 0-1/Variable eingegeben wird
   if (!(0 %in% y && 1 %in% y)) {
@@ -101,11 +111,11 @@ logitMod <- function(formula, data) {
   }
   y <- as.numeric(as.character(y))
 
-  # erstelle eine Liste als Ergebnis der MLE-Funktion
+  # conduct ML-Estimation for Full Model
   result <- MLE(y, X)
 
-  # erstelle das Null Modell und speichere es in die Ergebnisliste
-  nullModell <- MLE(X = matrix(rep(1, times = nrow(X)), ncol = 1), y = y)
+  # conduct ML-Estimation for Null Model
+  nullModell <- MLE(y = y, X = matrix(rep(1, times = nrow(X)), ncol = 1))
   result$nullModell <- nullModell
 
   # speichere notwendige Parameter in die Ergebnisliste
@@ -139,7 +149,6 @@ logitMod <- function(formula, data) {
 print.logitMod <- function(x, ...){
 
   cat("Call: ", paste0(deparse(x$call)), fill = TRUE)
-
   cat("\n\nCoefficients:\n")
 
   print.default(format(coef(x)[,1], digits = 4L),
@@ -158,7 +167,7 @@ print.logitMod <- function(x, ...){
 
   cat("\nNull Deviance:\t", round(nullDeviance,1))
   cat("\nResidual Deviance:", round(devianceResidual,1), "\t",
-      "AIC: ", round(x_AIC,1))
+      "AIC: ", round(x_AIC,1), "\n")
 
   # invisibly return linMod object
   invisible(x)
@@ -195,20 +204,11 @@ summary.logitMod <- function(object, ...) {
   pValue <- 2 * pnorm(-abs(zStat))
   object$pValue <- pValue
 
-  # sigCode <- pValue
-  # sigCode[0 <= sigCode && sigCode < 0.001] <- "***"
-  # sigCode[0.001 <= sigCode && sigCode < 0.01] <- "**"
-  # sigCode[0.01 <= sigCode && sigCode < 0.5] <- "*"
-  # sigCode[0.05 <= sigCode && sigCode < 0.1] <- "."
-  # sigCode[0.1 <= sigCode && sigCode <= 1] <- ""
-  # object$sigCode <- sigCode
-
   # Zusammenfassung der Werte für die Koeffizienten
   object$coefficients <- cbind("Estimate" = object$coefficients[,],
                                "Std. error" = object$betaStandardError[,],
                                "z value" = object$zStat[,],
                                "Pr(>|z|)" = object$pValue[,])
-  #" " = object$sigCode[,])
 
   # Berechnung von nullDeviance, residualDeviance & aic
   nullDeviance <- sum(object$nullModell$devianceResidual^2)
@@ -248,8 +248,6 @@ print.summary.logitMod <- function(x, ...) {
 
   cat("\nCoefficients:\n")
   printCoefmat(x$coefficients, signif.legend = TRUE, digits = 4L)
-
-  cat("\n(Dispersion parameter for binomial family taken to be 1)\n")
 
   cat("\n    Null deviance: ",
       round(x$nullDeviance,2), " on ", x$dfNull, " degrees of freedom\n")
