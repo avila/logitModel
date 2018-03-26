@@ -18,7 +18,7 @@ MLE <- function(y, X, tolerance = 1e-5, epsilon = 1e-10, iterMax = 1e3) {
 
   # Newton Raphson Method
   i <- 1
-  while (epsilon > tolerance || i < iterMax) {
+  while (epsilon > tolerance & i < iterMax) {
 
     # p := probabilities
     p <- as.numeric(logist(X %*% beta))
@@ -97,7 +97,7 @@ logitMod <- function(formula, data) {
 
   # falls y nicht als 0-1/Variable eingegeben wird
   if (!(0 %in% y && 1 %in% y)) {
-      y <- factor(y, labels = c(0,1))
+    y <- factor(y, labels = c(0,1))
   }
   y <- as.numeric(as.character(y))
 
@@ -205,9 +205,9 @@ summary.logitMod <- function(object, ...) {
 
   # Zusammenfassung der Werte für die Koeffizienten
   object$coefficients <- cbind("Estimate" = object$coefficients[,],
-                          "Std. error" = object$betaStandardError[,],
-                          "z value" = object$zStat[,],
-                          "Pr(>|z|)" = object$pValue[,])
+                               "Std. error" = object$betaStandardError[,],
+                               "z value" = object$zStat[,],
+                               "Pr(>|z|)" = object$pValue[,])
   #" " = object$sigCode[,])
 
   # Berechnung von nullDeviance, residualDeviance & aic
