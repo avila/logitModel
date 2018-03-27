@@ -3,5 +3,5 @@
 S3method(plot,logitMod)
 S3method(print,logitMod)
 S3method(print,summary.logitMod)
-S3method(summary,logitMod)
+export(MLE)
 export(logitMod)

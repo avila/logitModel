@@ -27,9 +27,11 @@ fit$coefficients
 ##-----------------------------------
 data <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
 data$rank <- factor(data$rank)
-#data$admit <- factor(data$admit)
-data$admit
+#data$admit <- factor(data$admit, labels = c(0,1))
+#mydata$admit[1:20] <-
 myFit <- logitMod(formula = admit ~ gre + gpa + rank, data = data)
+# myFit
+debugonce(print.summary.logitMod)
 summary(myFit)
 # summary(statFit)
 myFit$coefficients
@@ -39,3 +41,4 @@ cbind(myFit$coefficients, statFit$coefficients)
 
 statFit <- glm(formula = admit ~ gre + gpa + rank, data = data, family = binomial)
 statFit
+summary(statFit)

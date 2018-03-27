@@ -4,13 +4,13 @@
 \alias{summary.logitMod}
 \title{Summary method for "logitMod" estimations}
 \usage{
-\method{summary}{logitMod}(object, ...)
+\method{summary}{logitMod}(model, ...)
 }
 \arguments{
-\item{object}{an object of class "logitMod"}
-
 \item{...}{unused parameter, methods are required to have same
 arguments as their generic functions}
+
+\item{object}{an object of class "logitMod"}
 }
 \value{
 a list of all necessary values equivalent to the summary output of the

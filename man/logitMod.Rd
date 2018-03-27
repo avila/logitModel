@@ -4,7 +4,7 @@
 \alias{logitMod}
 \title{Alternative Interface for Logistic Regression Modelling}
 \usage{
-logitMod(formula, data, precision = 1e-14, iterMax = 100)
+logitMod(formula, data, precision = 1e-10, iterMax = 100)
 }
 \arguments{
 \item{formula}{an object of class "formula".}
