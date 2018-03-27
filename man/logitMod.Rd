@@ -2,18 +2,26 @@
 % Please edit documentation in R/logitModell.R
 \name{logitMod}
 \alias{logitMod}
-\title{Title}
+\title{Alternative Interface for Logistic Regression Modelling}
 \usage{
-logitMod(formula, data, tolerance = 1e-14, iterMax = 100)
+logitMod(formula, data, precision = 1e-14, iterMax = 100)
 }
 \arguments{
-\item{formula}{}
+\item{formula}{an object of class "formula".}
+
+\item{data}{a data frame or coercible to one}
+
+\item{precision}{degree of precision of optimisation algorithm}
+
+\item{iterMax}{maximum number of iterations of optimisation algorithm}
 }
 \value{
-
+\code{logitMod} returns an object of \code{\link[base]{class}}
+    \emph{logitMod}.
 }
 \description{
-Descrption
+\code{logitMod} computes a logistic regression for a binary response variable
+   via \code{\link{MLE}} estimation method.
 }
 \examples{
 

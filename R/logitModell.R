@@ -32,10 +32,12 @@
 MLE <- function(y, X, precision = 1e-14, iterMax = 100) {
 
   # Newton Raphson Method
+
   # follows Czepiel (2002) notation (page 8)
   beta <- rep(0, times = ncol(X))
   i <- 1
   convergence <- FALSE
+
   while (i <= iterMax & convergence == FALSE) { # epsilon > precision &
 
     # calculate probabilities (mu)
@@ -45,7 +47,7 @@ MLE <- function(y, X, precision = 1e-14, iterMax = 100) {
     # init / update ... Matrix W
     W <- diag(mu * (1 - mu))
 
-    # calculate and update beta
+    # calculate and update beta (eq. 23 from Czepiel, 2002)
     deltaBeta <- solve(t(X) %*% W %*% X) %*% t(X) %*% (y - mu)
     beta <- beta + deltaBeta
 
@@ -78,7 +80,7 @@ MLE <- function(y, X, precision = 1e-14, iterMax = 100) {
   maxLL <- (sum((y * X %*% beta) - (log(1 + exp(X %*% beta)))))
 
   # Liste der zurückgegebenen Werte
-  result <- list(coefficients = beta,
+  result <- list(coefficients = beta[,],
                  ## residuals??
                  fittedValues = mu,
                  vcov = vcov,
@@ -95,13 +97,15 @@ MLE <- function(y, X, precision = 1e-14, iterMax = 100) {
 #' Alternative Interface for Logistic Regression Modelling
 #'
 #' \code{logitMod} computes a logistic regression for a binary response variable
+#'    via \code{\link{MLE}} estimation method.
 #'
-#' @param formula
-#' @param data
-#' @param formula
-#' @param formula
+#' @param formula an object of class "formula".
+#' @param data a data frame or coercible to one
+#' @param precision degree of precision of optimisation algorithm
+#' @param iterMax maximum number of iterations of optimisation algorithm
 #'
-#' @return
+#' @return \code{logitMod} returns an object of \code{\link[base]{class}}
+#'     \emph{logitMod}.
 #'
 #' @examples
 #'
@@ -109,9 +113,10 @@ MLE <- function(y, X, precision = 1e-14, iterMax = 100) {
 logitMod <- function(formula, data, precision = 1e-14, iterMax = 100) {
 
   # generate model.frame, extract design matrix (X) and response var (y)
-  modelFrame <- model.frame(formula, data)
+  modelFrame <- model.frame(formula, as.data.frame(data))
   X <- model.matrix(formula, modelFrame)
   y <- model.response(modelFrame)
+
 
   # TODO: sanity checks
   if (FALSE) {
@@ -201,38 +206,36 @@ print.logitMod <- function(x, ...){
 #' testModelFrame <- model.frame(admit ~ gre + gpa + rank, testData)
 #' logm <- logitMod(formula = admit ~ gre + gpa + rank, data = testData)
 #' summary(logm)
-#' @export
-summary.logitMod <- function(object, ...) {
+summary.logitMod <- function(model, ...) {
 
   # Koeffizienten Standardfehler
-  betaStandardError <- as.matrix(sqrt(diag(object$vcov)))
-  object$betaStandardError <- betaStandardError
+  betaStandardError <- as.matrix(sqrt(diag(model$vcov)))
+  model$betaStandardError <- betaStandardError
 
   # z-Statistik
-  zStat <- object$coefficients / betaStandardError
-  object$zStat <- zStat
+  zStat <- model$coefficients / betaStandardError
+  model$zStat <- zStat
 
   # p-Werte
   pValue <- 2 * pnorm(-abs(zStat))
-  object$pValue <- pValue
+  model$pValue <- pValue
 
-  # Zusammenfassung der Werte für die Koeffizienten
-  object$coefficients <- cbind("Estimate" = object$coefficients[,],
-                               "Std. error" = object$betaStandardError[,],
-                               "z value" = object$zStat[,],
-                               "Pr(>|z|)" = object$pValue[,])
+  # Zusammenfassung der Werte für die Koeffizienten [,]
+  model$coefficients <- cbind("Estimate" = model$coefficients,
+                               "Std. error" = model$betaStandardError,
+                               "z value" = model$zStat,
+                               "Pr(>|z|)" = model$pValue)
 
   # Berechnung von nullDeviance, residualDeviance & aic
-  nullDeviance <- sum(object$nullModell$devianceResidual^2)
-  object$nullDeviance <- nullDeviance
-  residualDeviance <- sum(object$devianceResidual^2)
-  object$residualDeviance <- residualDeviance
-  x_AIC <- (-2*object$maxLL + 2*ncol(object$X))
-  object$AIC <- x_AIC
+  nullDeviance <- sum(model$nullModell$devianceResidual^2)
+  model$nullDeviance <- nullDeviance
+  residualDeviance <- sum(model$devianceResidual^2)
+  model$residualDeviance <- residualDeviance
+  model$AIC <- (-2*model$maxLL + 2*ncol(model$X))
 
-  class(object) <- "summary.logitMod"
+  class(model) <- "summary.logitMod"
 
-  return(object)
+  return(model)
 
 }
 

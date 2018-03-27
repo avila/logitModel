@@ -10,6 +10,10 @@ statFit <- glm(formula = admit ~ gre + gpa + rank, data = testData, family = bin
 myFit
 statFit
 ## -----------------------------------
+myFit$vcov
+vcov(statFit)
+
+## -----------------------------------
 rm(myFit, statFit)
 ##------------------------------------
 set.seed(42)
@@ -20,3 +24,18 @@ X <- cbind(b1 = 1, b2 = X1, b3 = X2)
 fit <- MLE(y = y, X = X)
 fit$coefficients
 
+##-----------------------------------
+data <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+data$rank <- factor(data$rank)
+#data$admit <- factor(data$admit)
+data$admit
+myFit <- logitMod(formula = admit ~ gre + gpa + rank, data = data)
+summary(myFit)
+# summary(statFit)
+myFit$coefficients
+##################
+cbind(myFit$coefficients, statFit$coefficients)
+################
+
+statFit <- glm(formula = admit ~ gre + gpa + rank, data = data, family = binomial)
+statFit
