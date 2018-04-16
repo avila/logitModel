@@ -6,10 +6,10 @@
 #' This function is the calculation behind the \code{\link{logitMod}}
 #' formula interface to the user.
 #'
-#' @param y Matrix/vector containing the response variable
-#' @param X Matrix/vector containing the design matrix (including intercept)
-#' @param precision Degree of precision of algorithm
-#' @param iterMax Maximum number of iterations of optimisation algorithm
+#' @param y Matrix/vector containing the response variable.
+#' @param X Matrix/vector containing the design matrix (including intercept).
+#' @param precision Degree of precision of algorithm.
+#' @param iterMax Maximum number of iterations of optimisation algorithm.
 #'
 #' @return A list with maximum likelihood estimation results.
 #'
@@ -29,10 +29,11 @@
 #' y <- rbinom(n, 1, exp(points) / (1 + exp(points)))
 #' X <- cbind(b1 = 1, b2 = X1, b3 = X2)
 #' fit <- MLE(y = y, X = X)
+#'
+#' @export
 MLE <- function(y, X, precision = 1e-14, iterMax = 100) {
 
   # Newton Raphson Method
-
   # follows Czepiel (2002) notation (page 8)
   beta <- rep(0, times = ncol(X))
   i <- 1
@@ -94,46 +95,73 @@ MLE <- function(y, X, precision = 1e-14, iterMax = 100) {
   return(result)
 }
 
-#' Alternative Interface for Logistic Regression Modelling
+#' Formula Interface for Logistic Regression
 #'
 #' \code{logitMod} computes a logistic regression for a binary response variable
 #'    via \code{\link{MLE}} estimation method.
 #'
 #' @param formula an object of class "formula".
-#' @param data a data frame or coercible to one
-#' @param precision degree of precision of optimisation algorithm
-#' @param iterMax maximum number of iterations of optimisation algorithm
+#' @param data an optional data frame or coercible to one. If not used,
+#' the variables are taken from the Global Environment.
+#'
+#' @param precision degree of precision of optimisation algorithm.
+#' @param iterMax maximum number of iterations of optimisation algorithm.
 #'
 #' @return \code{logitMod} returns an object of \code{\link[base]{class}}
 #'     \emph{logitMod}.
 #'
 #' @examples
-#'
+#' set.seed(42)
+#' X1 <- rnorm(100);    X2 <- rnorm(100);
+#' points <- 2 * X1 - 3 * X2
+#' y <- rbinom(100, 1, exp(points) / (1 + exp(points)))
+#' X <- cbind(b1 = 1, b2 = X1, b3 = X2)
+#' fit <- logitMod(y ~ X1 + X2)
 #' @export
-logitMod <- function(formula, data, precision = 1e-14, iterMax = 100) {
+logitMod <- function(formula, data, precision = 1e-10, iterMax = 100) {
 
-  # generate model.frame, extract design matrix (X) and response var (y)
-  modelFrame <- model.frame(formula, as.data.frame(data))
+  # generate model.frame. If data unused, search variables in Global Env
+  if(missing(data)) {
+    modelFrame <- model.frame(formula, data = ".GlobalEnv")
+    } else {
+      modelFrame <- model.frame(formula, as.data.frame(data))
+    }
+
+  # Extract design matrix (X) and response var (y)
   X <- model.matrix(formula, modelFrame)
   y <- model.response(modelFrame)
 
+  # make sure response variable contains 0 and 1
+  if (!(0 %in% y && 1 %in% y)) {
+    y <- factor(y, labels = c(0, 1))
+  }
+  y <- as.numeric(as.character(y))
 
-  # TODO: sanity checks
-  if (FALSE) {
-    TRUE
+  # small sanity checks
+  if (length(unique(y)) != 2) {
+    stop("Response variable is expected to be binary")
   }
 
   # conduct ML-Estimation for Full Model
   result <- MLE(y, X, precision = precision, iterMax = iterMax)
 
+
   # conduct ML-Estimation for Null Model
   nullModell <- MLE(y = y, X = matrix(rep(1, times = nrow(X)),ncol = 1),
                     precision = precision, iterMax = iterMax)
-  result$nullModell <- nullModell
+
+  idx <- match(c("coefficients",
+                 "devianceResidual",
+                 "dfRes",
+                 "dfNull",
+                 "maxLL",
+                 "iterCount"),
+               names(result$nullModell))
+  result$nullModell <- nullModell[idx]
 
   # Results
-  result$formula <- formula
   result$call <- match.call()
+  result$formula <- formula
   result$X <- X
   result$y <- y
 
@@ -143,29 +171,25 @@ logitMod <- function(formula, data, precision = 1e-14, iterMax = 100) {
   result
 }
 
-
-#' Printing method for logitMod estimations
+#' S3 Print method for logitMod class
 #'
-#' Printing method for class "logitMod"
+#' This internal function defines a \code{\link{print}} method for an object of
+#' logitMod class.
 #'
-#' @param x an object of class "logitMod"
-#' @param ... unused parameter, methods are required to have same
-#' arguments as their generic functions
-#' @return a standard print output equivalent to the built in binary logistic regression
-#' @examples
-#' testData <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")[1:100,]
-#' testData$rank <- factor(testData$rank)
-#' testModell <- as.formula("admit ~ gre + gpa + rank")
-#' testModelFrame <- model.frame(admit ~ gre + gpa + rank, testData)
-#' logm <- logitMod(formula = admit ~ gre + gpa + rank, data = testData)
-#' print(logm)
+#' @param x a "logitMod" object
+#' @param ... methods are required to include (at least) the same arguments
+#' as their generic functions.
+#'
+#' @return a brief summary of the model results.
+#'
 #' @export
 print.logitMod <- function(x, ...){
 
+  # based on stats:::print.lm()
   cat("Call: ", paste0(deparse(x$call)), fill = TRUE)
   cat("\n\nCoefficients:\n")
 
-  print.default(format(coef(x)[,1], digits = 4L),
+  print.default(format(coef(x), digits = 4L),
                 print.gap = 1L, quote = FALSE, right = TRUE)
 
   cat("\nDegrees of Freedom: ", x$dfNull, " Total (i.e. Null); ",
@@ -174,11 +198,8 @@ print.logitMod <- function(x, ...){
   # Berechnung von null deviance, residual deviance & aic
   # TODO: take it out of here
   nullDeviance <- sum(x$nullModell$devianceResidual^2)
-  x$nullDeviance <- nullDeviance
   devianceResidual <- sum(x$devianceResidual^2)
-  x$devianceResidual <- devianceResidual
-  x_AIC <- (-2*x$maxLL + 2*ncol(x$X))
-  x$AIC <- x_AIC
+  x_AIC <- (-2 * x$maxLL + 2 * ncol(x$X))
 
   cat("\nNull Deviance:\t", round(nullDeviance,1))
   cat("\nResidual Deviance:", round(devianceResidual,1), "\t",
@@ -186,85 +207,75 @@ print.logitMod <- function(x, ...){
 
   # invisibly return linMod object
   invisible(x)
-
 }
 
 
-#' Summary method for "logitMod" estimations
+#' S3 Summary method for logitMod class
 #'
-#' Summary method for class "logitMod"
+#' This internal function defines a \code{\link{summary}} method for an object
+#' of logitMod class, where also further statistics are computed for model
+#' comparison and for the print.summary method.
 #'
-#' @param object an object of class "logitMod"
-#' @param ... unused parameter, methods are required to have same
-#' arguments as their generic functions
-#' @return a list of all necessary values equivalent to the summary output of the
-#' built in binary logistic regression
-#' @examples
-#' testData <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")[1:100,]
-#' testData$rank <- factor(testData$rank)
-#' testModell <- as.formula("admit ~ gre + gpa + rank")
-#' testModelFrame <- model.frame(admit ~ gre + gpa + rank, testData)
-#' logm <- logitMod(formula = admit ~ gre + gpa + rank, data = testData)
-#' summary(logm)
+#' @param model a "logitMod" model
+#' @param ... methods are required to include (at least) the same arguments
+#' as their generic functions.
+#'
+#' @return a list with more detailed statistics and computations on the
+#' estimated model
+#'
+#' @export
 summary.logitMod <- function(model, ...) {
 
   # Koeffizienten Standardfehler
-  betaStandardError <- as.matrix(sqrt(diag(model$vcov)))
-  model$betaStandardError <- betaStandardError
+  betaSE <- sqrt(diag(model$vcov))
+  model$betaSE <- betaSE
 
   # z-Statistik
-  zStat <- model$coefficients / betaStandardError
+  zStat <- model$coefficients / betaSE
   model$zStat <- zStat
 
   # p-Werte
   pValue <- 2 * pnorm(-abs(zStat))
   model$pValue <- pValue
 
-  # Zusammenfassung der Werte für die Koeffizienten [,]
-  model$coefficients <- cbind("Estimate" = model$coefficients,
-                               "Std. error" = model$betaStandardError,
-                               "z value" = model$zStat,
-                               "Pr(>|z|)" = model$pValue)
-
   # Berechnung von nullDeviance, residualDeviance & aic
-  nullDeviance <- sum(model$nullModell$devianceResidual^2)
-  model$nullDeviance <- nullDeviance
-  residualDeviance <- sum(model$devianceResidual^2)
-  model$residualDeviance <- residualDeviance
-  model$AIC <- (-2*model$maxLL + 2*ncol(model$X))
+  model$nullDeviance <- sum(model$nullModell$devianceResidual^2)
+  model$residualDeviance <- sum(model$devianceResidual^2)
+  model$AIC <- (-2 * model$maxLL + 2 * ncol(model$X))
 
   class(model) <- "summary.logitMod"
 
   return(model)
-
 }
 
 
-#' Printing method for the summary of "logitMod" estimations
+#' S3 Print Method for summary.logitMod Objects
 #'
-#' Printing method for summary of class "logitMod"
+#' This internal function defines a \code{\link{print}} method for an object
+#' of \code\link{summary.logitMod} class
 #'
-#' @param x an object of class "logitMod"
-#' @param ... unused parameter, methods are required to have same
-#' arguments as their generic functions
-#' @return an equivalent output to the summary of the built in binary logistic regression
-#' @examples
-#' testData <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")[1:100,]
-#' testData$rank <- factor(testData$rank)
-#' testModell <- as.formula("admit ~ gre + gpa + rank")
-#' testModelFrame <- model.frame(admit ~ gre + gpa + rank, testData)
-#' logm <- logitMod(formula = admit ~ gre + gpa + rank, data = testData)
-#' summary(logm)
+#' @param x an object of class "summary.logitMod"
+#' @param ... methods are required to include (at least) the same arguments
+#' as their generic functions.
+#'
+#' @return a summary of the model results.
+#'
 #' @export
 print.summary.logitMod <- function(x, ...) {
 
   cat("Call: ", deparse(x$call), fill = TRUE)
 
   cat("\nDeviance Residuals:\n")
-  print.summaryDefault(summary(x$devianceResidual)[-4], digits = 4L)
+  print.summaryDefault(summary(x$devianceResidual), digits = 4L)
 
   cat("\nCoefficients:\n")
-  printCoefmat(x$coefficients, signif.legend = TRUE, digits = 4L)
+
+  x$coefTable <- cbind("Estimate" = x$coefficients,
+                              "Std. error" = x$betaSE,
+                              "z value" = x$zStat,
+                              "Pr(>|z|)" = x$pValue)
+
+  printCoefmat(x$coefTable, signif.legend = TRUE, digits = 4L)
 
   cat("\n    Null deviance: ",
       round(x$nullDeviance,2), " on ", x$dfNull, " degrees of freedom\n")
@@ -284,43 +295,32 @@ print.summary.logitMod <- function(x, ...) {
 #' @param x an object of class "logitMod"
 #' @param ... unused parameter, methods are required to have same
 #' arguments as their generic functions
-#' @return equivalent plots to those of the built in binary logistic regression
-#' @examples
-#' testData <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")[1:100,]
-#' testData$rank <- factor(testData$rank)
-#' testModell <- as.formula("admit ~ gre + gpa + rank")
-#' testModelFrame <- model.frame(admit ~ gre + gpa + rank, testData)
-#' logm <- logitMod(formula = admit ~ gre + gpa + rank, data = testData)
-#' plot(logm)
 #' @export
 plot.logitMod <- function(x, which = 1, ...) {
 
   if (which == 1) {
+
     plot(y = x$devianceResidual, x = (x$X %*% x$coefficients),
          main = "Residuals vs Fitted",
          ylab = "Residuals",
          xlab = paste("Predicted Values\n",
                       deparse(x$call)))
     abline(a = 0, b = 0, lty = 3)
+
   } else if (which == 2) {
+
     qqnorm(x$devianceResidual,
            main = "Normal Q-Q",
            ylab = "Std. deviance resid.",
            xlab = paste("Theoretical Quantiles\n", deparse(x$call)))
     qqline(x$devianceResidual, lty = 3)
-  } else {
+
+    } else {
+
     plot(y = sqrt(abs(x$devianceResidual)), x = (x$X %*% x$coefficients),
          main = "Scale Location",
          ylab = expression(sqrt("|Std. deviance resid.|")),
          xlab = paste("Predicted Values\n", deparse(x$call)))
   }
-
-  # #4 shittt
-  # pearsonResidual <-
-  #     (x$y - x$fittedValues)/sqrt(x$fittedValues*(1 - x$fittedValues))
-  # plot(y = pearsonResidual, x = diag(x$W))
 }
 
-
-## Helper Functions
-logist <- function(eta) return(exp(eta) / (1 + exp(eta)))
