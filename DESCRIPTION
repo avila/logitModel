@@ -1,7 +1,7 @@
 Package: logitModel
 Type: Package
 Title: Simple Alternative to Logit Modelling in R
-Version: 0.1.23
+Version: 0.1.24
 Author: Marcelo R. Avila
 Maintainer: Marcelo R. Avila <m.rainho.avila@gmail.com>
 Description: This is package is part of the final assigment 
@@ -10,5 +10,8 @@ Description: This is package is part of the final assigment
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

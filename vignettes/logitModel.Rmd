@@ -1,0 +1,105 @@
+---
+title: "logitMod"
+author: "Marcelo Rainho Avila"
+date: "24.04.2018"
+output: 
+  rmarkdown::pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+abstract: 
+    "As part of the *Statistical Programming with R* course ministered in the Winter Term of 2017 / 2018, this vignette aims to explore the implementation of package that conducts a logistic regression estimation method. The created package includes a Maximum Likelihood Estimator based on the Newton-Rahpson algorithm, a formula interface for better user interaction, a `print`, `summary`, `plot` and S3-Methods that mimics the `glm(..., family = binomial)` implementation of the *stats* package as well as a `pairs` method for an overview of the interaction between the explanatory and explained variables."
+vignette: >
+  %\VignetteIndexEntry{logitMod}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#")
+```
+
+
+```{r library, include=FALSE}
+library("logitModel")
+```
+
+\newpage
+
+# Introduction 
+
+Differently to the linear regression estimation methods, the logistic regression, being one member of the generalized linear models, is used when conducting estimations for a categorical response data. A categorical variable has a measurement scale of a set of countable categories. A student might be trying to decide between studying Economics, Administration or Psychology.  A political scientist, for example, might be interested in the political view of the participants in a interview, such as "left-leaning", "moderate" or "right-leaning". A physician could be classifiying the stage of a pacients disease as in "initial", "middle" or "advanced" stage. A computer scientist might be interested in classifing whether an image contains a hot-dog or it does not. These type of data is of importance in several applications and research areas. 
+
+From the above examples, oen is able to verify certain distinctions between the types of information. 
+The choices faced by the student are called to have a *nominal* scale, since there is not a natural way of ordering those subjects. On the other hand, the diesease stage of interest to the physician has a natural ordering and, thus, can be said to have a *ordinal* scale. The most simple of these type of data are *binary*, that is, it can only take two possible values, such as "sucess / failure", "won / lost", "hot-dog / not hot-dog" and, more generally, "1 / 0". For this type of data, a logistic regression can ben conducted for estimating the probability of an event ocurring give the set of explanatory varibales that the model is built upon and will be more deeply explored in the next section. 
+
+\newpage
+
+# Theoretical
+
+In this section, I will explore the theorical underpinning of the logistic regression model. 
+
+## Linear Probability Model 
+
+In a ordinary regression $\mathbb{E}(y|x) = \mu$, is a *linear* function of $x$, as in
+
+\begin{equation} \label{eq:linear_mod}
+   \pi (x) = \alpha + \beta x
+\end{equation}
+
+where the probability of success changes linearly with changes of $x$, with $\beta$ being the change in expected probability in $y$ respective to a unit change in $x$. This simple model can be a very good approximation and very useful for a range of data values of $x$. Nevertheless, when the values of $x$ are relatively high or relatively low, the expected values of $y$ can exceed the range $[0, 1]$, which are not sensible values when dealing with probability of an event. This deficiency can be eliminated introducing a non-linear relationship between $x$ and $\pi(x)$, such that the Domain of $\pi(x)$ lies inside $[0,1]$.  One possible function with such caracteristics is the (standard) logistic function
+
+\begin{equation} \label{eq:logistic}
+   f (x) = \frac {1} {1 + e^{-x}}
+        \Leftrightarrow \frac{e^x}{1 + e^x}
+\end{equation}
+
+When modelling a binary response variable via a *logit* link function, the expected probability will follow Equation \ref{eq:logistic} and the shapes in Figure \ref{fig:logistic} (here in the single variable scenario without loss of generality):
+
+\begin{equation} \label{eq:logistic}
+   \pi(x) = \frac {1} {1 + e^{-(\alpha + \beta x)}}
+        \Leftrightarrow \frac{e^{(\alpha + \beta x)}}{1 + e^{(\alpha + \beta x)}}
+\end{equation}
+
+
+```{r shapeLogistic, echo=FALSE, fig.height=2.7, fig.cap=cap, fig.align='center'}
+cap <- paste("Shape of logistic function for positive and negative values of",
+              "$\\beta$ and $\\alpha = 0$.",
+             "\\label{fig:logistic}")
+
+op <- par(mfrow = c(1,2), mar = c(-.2, 0, -1, -0.5) + 1.5, cex = 0.9,
+          cex.axis = 0.9, tcl = -0.15, oma = c(0, 0, 0, 0), mgp = c(2, 0.5, 0))
+
+lim <- 5.5
+curve(logitModel:::logist(x), from = -lim, to = lim, ylab = "",
+      main = "")
+legend(-2.5,.8, expression(beta > 0), bty = "n")
+curve(logitModel:::logist(-x), from = -lim, to = lim, 
+      main = "")
+legend(0,0.4, expression(beta < 0), bty = "n")
+```
+
+From the Figure \ref{eq:logistic}, it is easy to observe the non-linearity between the explanatory and the response variable. For different values of $x$, the increased probability of *sucess* can behave very differently if the starting values of $x$ are relatively low compared to the same variation in $x$ when starting from a higher value. 
+
+The logistic regression is a special case of a Generalized Linear Model, where the response variable follows a binomial distribution. A variable follows a binomial distribution with parameters $n$ and $p$ when the Probability Function is given by 
+
+$$f (x) = {n \choose x} p^x (1-p)^{x-n} \quad (x=0,1,2,...n)$$
+
+where $n$ is the amount of *attempts* and $p$ the probability of success in each attempt. 
+
+The *link* function 
+
+
+
+
+\newpage
+
+# Practical 
+
+\newpage
+
+# Discussion and Finishing lines
+
+
