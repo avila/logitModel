@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1524544501779.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3223970461",
+    "id" : "7F9BAD60",
+    "lastKnownWriteTime" : 1524543936,
+    "last_content_update" : 1524543936,
+    "path" : "~/Documents/STUDIUM/Programming/R_git/logitModel/R/logitModel.R",
+    "project_path" : "R/logitModel.R",
+    "properties" : {
+        "cursorPosition" : "169,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

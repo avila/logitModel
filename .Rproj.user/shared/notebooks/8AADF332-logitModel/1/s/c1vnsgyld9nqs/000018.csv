@@ -1,0 +1,4 @@
+"0","b <- attr(pp, ""gradient"")"
+"0","a <- pp - x * attr(pp,""gradient"") "
+"0","ad <- 1.22"
+"0","lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))"

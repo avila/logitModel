@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1524544502922.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E1EF0A04",
+    "lastKnownWriteTime" : 1522038429,
+    "last_content_update" : 1522038429,
+    "path" : "~/Documents/STUDIUM/Programming/R_git/logitModel/R/testModel.R",
+    "project_path" : "R/testModel.R",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

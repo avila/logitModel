@@ -1,0 +1,512 @@
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = "iter. 02", cex = 0.8)
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'(x)"), cex = 0.8)
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = "iter. 02", cex = 0.8)
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression(f(x))), cex = 0.8)
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression(~f(x))), cex = 0.8)
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression(fx), cex = 0.8)
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = "iter. 02", cex = 0.8)
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[1]), cex = 0.8)
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = "iter. 02", cex = 0.8)
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[1]), cex = 0.8)
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2]), cex = 0.8)
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[1]), cex = 0.8)
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2]), cex = 1)
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[1]), cex = 0.8)
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2]"(x)"), cex = 1)
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[1]), cex = 0.8)
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2],"(x)"), cex = 1)
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = paste(expression("f'"[1]), "(x)"))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2]"(x)"))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = paste(expression("f'"[1]), "(x)"))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2])
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = paste(expression("f'"[1]), "(x)"))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2]))
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression(paste0("f'"[1]), "(x)"))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2]))
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[1])))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[1]))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[2]))
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+cap = "Illustration of the Newton-Rahpson Method"
+par(mar = c(0,0,2,0))
+curve(x^3 - 0, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),
+xlab = "",
+ylab = "",
+main = "Newton-Raphson Method")
+abline(h=200)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[i]))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + 1/2, y = -150, labels = expression(hat(theta)[i]))
+x <- 10
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp)
+text(x-0.5, y = pp + 300, labels = expression("f'"[1+i]))
+text(x = -a / b + 1, y = -150, labels = expression(hat(theta)[i+1]))
+devtools::load_all(".")
+debugonce(logitModel:::pairs.logitModel)
+pairs(myfit)
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#")
+library("logitModel")
+cap <- paste("Shape of logistic function for positive and negative values of",
+"$\\beta$ and $\\alpha = 0$.",
+"\\label{fig:logistic}")
+op <- par(mfrow = c(1,2), mar = c(1.3, 1, -1, -0.5) + 2, cex = 0.9,
+cex.axis = 0.9, tcl = -0.15, oma = c(0, 0, 0, 0), mgp = c(2, 0.5, 0))
+lim <- 5.5
+curve(logitModel:::logist(x), from = -lim, to = lim,
+ylab = "P(Y = 1)", main = "", xlab = "x")
+legend(-2.5,.8, expression(beta[i] > 0), bty = "n")
+curve(logitModel:::logist(-x), from = -lim, to = lim,
+ylab = "P(Y = 1)", main = "", xlab = "x")
+legend(0,0.4, expression(beta[i] < 0), bty = "n")
+cap2 <- paste("Illustration of the Newton-Rahpson Method.",
+"\\label{fig:nr}")
+cap = ""
+par(mar = c(0,0,0,0))
+curve(x^3, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n",
+ylim = c(-300, 7000),xlab = "",ylab = "",main = "")
+h<-200
+abline(h=h)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp, pch=20)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[i]))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + .45, y = -270, labels = expression(hat(theta)[i]))
+x <- (-a + h) / b
+pp <- eval(dx2x)
+lines(x =c(x, x) , y = c(h, pp), lty = 3)
+points(x, h, pch=20)
+points(5.8480, h, pch=20)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient")
+ad <- 1.22
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp, pch=20)
+text(x-0.5, y = pp + 300, labels = expression("f'"[1+i]))
+text(x = -a / b + 0.95, y = -270, labels = expression(hat(theta)[i+1]))
+points((-a + h)/b, h, pch=20)
+library(logitModel)
+fit <- logitModel(survived ~ age + sex, data = DonnerData)
+pairs(myfit)
+library(logitModel)
+fit <- logitModel(survived ~ age + sex, data = DonnerData)
+pairs(fit)
+ceiling(sqrt(length(model$coefficients)))
+ceiling(sqrt(length(betas)))
+ceiling(sqrt(length(betas)))
+library(logitModel)
+pairs(fit)
+pairs(fit)
+library(logitModel)
+pairs(fit)
+pairs(fit)
+library(logitModel)
+pairs(fit)
+?solve
+library(logitModel)
+devtools::build_vignettes()
+devtools::build_vignettes()
+install.packages("~/Desktop/logitModel_0.1.24.tar.gz", repos = NULL, type="source")
+vignette("logitModel")

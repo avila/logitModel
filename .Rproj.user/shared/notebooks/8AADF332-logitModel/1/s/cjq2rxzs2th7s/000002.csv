@@ -1,0 +1,2 @@
+"0","library(logitModel)"
+"0","fit <- logitModel(survived ~ age + sex, data = DonnerData)"

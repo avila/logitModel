@@ -1,0 +1,414 @@
+---
+title: "logitModel"
+author: "Marcelo Rainho Avila"
+date: "24.04.2018"
+header-includes:
+   - \usepackage{mathrsfs}
+output: 
+  rmarkdown::pdf_document:
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+abstract: 
+    "As part of the *Statistical Programming with R* course ministered in the Winter Term of 2017 / 2018, this vignette aims to explore the implementation of package that conducts a logistic regression estimation method. The created package includes a Maximum Likelihood Estimator based on the Newton-Rahpson algorithm, a formula interface for easier user interaction, a `print`, `summary`, `plot` and S3-Methods that mimics the `glm(..., family = binomial)` implementation of the *stats* package as well as a `pairs` method for an overview of the interaction between the explanatory and explained variables."
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{logitModel}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#")
+```
+
+
+
+```{r library, include=FALSE}
+library("logitModel")
+```
+
+\newpage
+
+# Introduction 
+
+Differently to the linear regression estimation methods, the logistic regression, being one member of the generalized linear models, is used when conducting estimations for a categorical response data. A categorical variable has a measurement scale of a set of countable categories. A student might be trying to decide between studying Economics, Administration or Psychology.  A political scientist, for example, might be interested in the political view of the participants in a interview, such as "left-leaning", "moderate" or "right-leaning". A physician could be classifiying the stage of a pacients disease as in "initial", "middle" or "advanced" stage. A computer scientist might be interested in classifing whether an image contains a hot-dog or it does not. These type of data is of importance in several applications and research areas. 
+
+From the above examples, one is able to verify certain distinctions between the types of information.  The choices faced by the student are called to have a *nominal* scale, since there is not a natural way of ordering those subjects. On the other hand, the diesease stage of interest to the physician has a natural ordering and, thus, can be said to have a *ordinal* scale. The most simple of these type of data are *binary*, that is, it can only take two possible values, such as "sucess / failure", "won / lost", "hot-dog / not hot-dog" and, more generally, "1 / 0". For this type of data, a logistic regression can ben conducted for estimating the probability of an event ocurring give the set of explanatory variables that the model is built upon and will be more deeply explored in the next sections. 
+
+\newpage
+
+# Theoretical
+
+In this section, I will explore the theorical underpinning of the logistic regression model. 
+
+## From the Binomial Distribution 
+
+Assume there are $p$ explanatory variables and one wants to model their influence over the probability $\pi$, such that 
+
+$$\pi_i = P(Y_i = 1) = \mathbb{E}(Y_i)~.$$
+
+Assuming a linear regression model holds, it would follow that 
+
+$$\pi_i = P(Y_i = 1) = \mathbb{E}(Y_i) = \boldsymbol{x_i'\beta} ~,$$
+
+where the probability of success changes linearly with changes of $x$, with $\beta$ being the change in expected probability in $\pi$ respective to a unit change in $x$. This simple model can be a very good approximation and very useful for a range of data values of $x$. Nevertheless, due to the linearity of $\boldsymbol{x_i'\beta}$, this model could take values that exceed the range $[0, 1]$, which is non-sensical when dealing with probability values. 
+
+To solve this problem, the probability $P(Y_1 = 1)$ is trasnformed via a Distribution function $F(\eta)$, where $\eta$ is a linear predictor $\eta_i = \boldsymbol{x_i'\beta}$. There are a few commonly used *reponse* functions with the only restriction that $F()$ is strictly monotonically increasing over the whole Real Numbers with $F(\eta_i) \in [0,1]$. The exact choice of the *response function* $F()$, and the correspoding *link function* (that is, the inverse of the response function) will define the *kind* of binary response variable modelling to be conducted. For the standard normal distribution, one obtains a *probit model*. 
+
+For the **binary logit model**, the  Logist functionis employed. The model can be, thus, modelled as a logistic regression such that
+
+\begin{equation}
+  \pi_i = F(\eta_i) = \frac{\exp(\eta_i)} {1+\exp(\eta_i)}
+\label{eq:logist}
+\end{equation}
+
+or with the **logit link function**
+
+\begin{equation}
+    g(\pi_i) = \log \left(  \frac{\pi_i} {1 - \pi_i}\right) =
+    logit(\pi_i) =\eta_i = \boldsymbol{x_i'\beta} ~.
+    \label{eq:logit}
+\end{equation}
+
+In order to better visualize the relationship between the explanatory and the response variable (in a partial scenario), refer to Figure \ref{fig:logistic}. Here it is easy to observe the non-linearity between the explanatory and the response variable. For different values of $x$, the increased probability of *sucess* behave very differently if the starting values of $x$ are relatively low compared to the same variation in $x$ when starting from a higher value. 
+
+```{r shapeLogistic, echo=FALSE, fig.height=2.7, fig.cap=cap, fig.align='center'}
+cap <- paste("Shape of logistic function for positive and negative values of",
+              "$\\beta$ and $\\alpha = 0$.",
+             "\\label{fig:logistic}")
+
+op <- par(mfrow = c(1,2), mar = c(1.3, 1, -1, -0.5) + 2, cex = 0.9,
+          cex.axis = 0.9, tcl = -0.15, oma = c(0, 0, 0, 0), mgp = c(2, 0.5, 0))
+
+lim <- 5.5
+curve(logitModel:::logist(x), from = -lim, to = lim, 
+      ylab = "P(Y = 1)", main = "", xlab = "x")
+legend(-2.5,.8, expression(beta[i] > 0), bty = "n")
+curve(logitModel:::logist(-x), from = -lim, to = lim, 
+      ylab = "P(Y = 1)", main = "", xlab = "x")
+legend(0,0.4, expression(beta[i] < 0), bty = "n")
+```
+
+## Interpretation of the results
+
+Due to the non-linerarity of the model, one cannot directly interpret the variable coefficients as changes in the probability of an event occuring. To understand the modeol, we can refer to the *Odds* of the occurrence of an event. This is defined as the probability of the event occurring against the probability that it does not. Formally, 
+
+$$
+  Odds(\pi) \equiv \frac{P(Y=1)}{P(Y=0)} = \frac{P(Y=1)}{1 - P(Y=1)}
+      = \frac{\pi}{1 - \pi}~.
+$$
+
+This terminology is often used in gambling scenarios. That is, if the odds of winning in a hand of poker is 3 to 1 (i.e. 3/1 or 3:1), it is expected that the player wins 3 times out of every 4 games, which equals to 75 percent. And, as expected $\frac{3}{1} = \frac{0.75}{1 - 0.75}$.
+
+From Equations \ref{eq:logist} and \ref{eq:logit} one can show that
+
+\begin{equation}
+   Odds(\pi_i) = \frac{\pi_i}{1 - \pi_i} = \frac{\frac{\exp(\eta_i)}{1 + \exp(\eta_i)} }  
+       {\frac{1}{1 + \exp(\eta_i)}} = \exp(\eta_i)~.
+\label{eq:odds}
+\end{equation}
+
+Moreover, taking the log on both sides of equation (\ref{eq:odds}), one gets
+
+$$
+  \log \left( \frac{\pi_i}{1 - \pi_i} \right) = \eta_i = \boldsymbol{x_i'\beta} = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + ... + \beta_k x_{ik} ~. 
+$$
+
+Furthermore, due to the product rule of exponentials, one can show that 
+
+\begin{equation}
+    Odds_1(\pi \mid x_{i1}) = \frac{P(Y = 1 \mid x_{i1})}{P(Y = 0 \mid x_{i1})} = 
+              exp(\beta_0) \cdot exp(\beta_1 x_{i1}) \cdot~...~\cdot exp(\beta_k x_{ik}).
+\end{equation}
+
+And, if one increases $x_{i1}$ by one unit, while keeping other variables constant, one gets
+
+\begin{equation}
+Odds_2(\pi \mid x_{i1} + 1) = \frac{P(Y = 1 \mid x_{i1} + 1)}{P(Y = 0 \mid x_{i1} + 1)} = 
+              exp(\beta_0) \cdot exp(\beta_1 (x_{i1} + 1)) \cdot~...~\cdot exp(\beta_k x_{ik}). 
+\end{equation}
+
+Finally, if we divide $Odds_2$ by $Odds_1$, what is defined as the *Odds Ratio* between the two scenarios, we see that all terms cancel themselves out, leaving only the term with the added unit, as in 
+
+\begin{equation}
+   Odds~Ratio_{(2, 1)} = \frac {Odds_2(\pi, x_{i1} + 1)} {Odds_1(\pi, x_{i1})}
+      = exp(\beta_1).
+\end{equation}
+
+For instance, if $\beta_1 = 0.3$ and $x_1$, $exp(\beta_1) \approx 1.35$, which means that - for a continuous $x$ - the **odds** (not the probability) of the event occurring increases by about 35 percent, that means, it gets multiplied by 1.35, as $x$ increases by one unit. One can observe that while the Odds Ratio remains constant for any $x$, the probability itself depends on the base value one starts with. In case $x_1$ was a dummy variable (such as $x_1 = 0$, for male and $x_1 = 1$ for female) and keeping the same coefficient as illustrated above, than the odds of the event occurring is 35 percent higher for a female, when comparing to a male with, otherwise, same characteristics.  
+
+In general, if:
+
+- $\beta_i > 0 \Rightarrow exp(\beta_i) > 1 \Rightarrow Odds~increases$
+- $\beta_i < 0 \Rightarrow 0 < exp(\beta_i) < 1 \Rightarrow Odds~decreases$
+- $\beta_i = 0 \Rightarrow exp(\beta_i) = 1 \Rightarrow Odds~remains~constant$
+
+
+## Maximum Likelihood Estimation Method
+
+The Maximum Likelihood Estimation (MLE) is an method that estimates the parameters of a model by maximizing the *Likelihood* of obtaining the observed data. For a binary response variable stands that each $Y_i \sim B(1, \pi_i)$, where $\pi_i = \mathbb{E}(Y_i)$, that is, each observation is follows Binomial Distribution with one observation, which is, per definition, a Bernoulli Distribution
+
+$$
+f (x \mid \pi_i) = {\pi_i}^{y_i} (1 -\pi_i)^{1 - y_i}  ~.
+$$
+
+Assuming independent and identically distributed (iid) observed variables, the **Likelihood** function is defined as 
+
+$$\mathscr{L}(\boldsymbol\beta) = \prod_{i=1}^{n}f(y_i \mid \pi_i) =
+    \prod_{i=1}^{n} {\pi_i}^{y_i} (1 -\pi_i)^{1 - y_i}$$
+
+and for easier handling of the product over multiple terms, one can take the logarithm and arrive at the **log-likelihood**,
+
+$$
+\begin{aligned}
+\ell(\boldsymbol{\beta}) \equiv log(\mathscr{L(\boldsymbol{\beta})}) 
+   &= \sum_{i=n}^{n} \Big( y_i \log( \pi_i) - y_i \log(1 - \pi_i) + log(1-\pi_i) \Big) \\
+   &= \sum_{i=n}^{n} \Big( y_i \log( \frac{\pi_i}{1-\pi_i} ) + \log(1-\pi_i) \Big) \\
+\end{aligned}
+$$
+
+In the case of the logit models, from the above equation, it follows that 
+
+$$
+\ell(\boldsymbol{\beta}) = \sum_{i=n}^n \left( y_i (\boldsymbol{x'_i\beta}) - \log(1 
+                                       + \exp(\boldsymbol{x'_i\beta}) \right)~.
+$$
+
+
+### Score Vector
+
+For the calculation of the parameters that maximizes the Likelihood-function one can take the first derivative of the log-likelihood function over the parameters $\boldsymbol{\beta}$, which is defined as the *score vector*
+
+\begin{equation}
+\begin{aligned}
+   s(\boldsymbol\beta) &= \frac{\partial \ell(\boldsymbol\beta) }{\partial \boldsymbol\beta} = 
+        \frac{\partial}{\partial \boldsymbol\beta} 
+        \sum_{i=1}^{n} \Big( y_i \eta_i - \log (1 + \exp(\eta_i)) \Big) \\
+   &= \sum_{i=1}^{n} \Big( y_i - \frac{1}{1+\exp(\eta_i)}\exp(\eta_i)   \Big) \boldsymbol{x_i'} \\
+   &= \sum_{i=1}^{n} (y_i - \pi_i) \boldsymbol{x_i'}  
+\label{eq:score}
+\end{aligned}
+\end{equation}
+
+Extreme values for the estimates of $\boldsymbol\beta$ can be found by setting Eq. \ref{eq:score} equal to zero and solving for each $\beta_k$. Due to the monotonic transformation property of the logarithmic function, it can be shown that the vector of parameters that maximizes the log-likelihood is the same as maximizing the actual likelihood function [@czepiel, pp. 5].  
+
+The solutions, if existing, define the maximum point if the matrix of the second partial derivatives, denominated as Hessian Matrix, is negative definite, that is, if every diagonal element is less than zero [see @czepiel, pp. 6]. Since the Hessian Matrix computes the second derivative, that is, the curvature of the log-likelihood function, one can better grasp that the Hessian Matrix forms the variance-covariance matrix of the parameters estimates.  That is, a matrix with a strong curvature contains *abundant* information over the observed data and, therefore, less variation on the parameters is expected. On the other hand, a weakly curved matrix contains little information on the observed data and the estimated parameters can vary greatly. 
+
+### Fisher Information Matrix
+
+The Fisher Information Matrix is a measure of the information that a random variable $X$ carries about a unknown parameter upon which the probability of $X$ depends. It is derived from the Hessian Matrix and computed as
+
+$$
+  \mathcal{I}(\boldsymbol\beta) 
+  = -\mathbb{E}\Big(H(\boldsymbol\beta)\Big)
+  = -\mathbb{E} \left( \frac{\partial s(\boldsymbol\beta)}{\partial \boldsymbol{\beta} } \right)
+$$
+It can also be shown that the asymptotic variance of the ML Estimator reaches the Cramer-Rao bound, which fixes the lower bound of the variance of a unbiased estimator
+
+$$
+\mathrm{Var}(\hat{{\boldsymbol{\beta}}}_{ML}) = \frac{1}{\mathcal{I}(\boldsymbol\beta)} \leq 
+   \mathrm{Var}(\theta) ~.
+$$
+
+## The Newton-Raphson Method 
+
+Solving a system of non-linear equatoins cannot be done algebraically, as it is the case with the ordinary least squares estimator.  One popular algorithm for solving such problems is the Newton-Raphson method, which estimates the unknown parameters via a iterative process, that is explored in this section, which is based on the explanation from Czepiel (2002, pp. 7-8).
+
+
+Beggining with an intial guess for the solution, the Newton-Raphson method uess the first two terms of a Taylor polynomial approximation evaluated at the initial guess to obtain a better estimate, that is, one closer to the solution. The iterative algorithm can be basically described by 
+
+$$
+x_{i+1} = x_i - \frac{f(x_i)} {f'(x_i)}
+$$
+in order to solve a non-linear equation $f(x) = 0$ [see @ypma, 531]. For a illustration of the method, refer to Fig. \ref{fig:nr}, based on [@polyak, p. 1087]. 
+
+In the logistic regression, the (system of) equations to be solved are as defined in Eq. (\ref{eq:score}) for each $\beta$, where
+
+$$
+ \boldsymbol\beta^{i+1} = \boldsymbol\beta^{i} - \frac{ s(\boldsymbol\beta) }{ H(\boldsymbol\beta)}~.
+$$
+
+In matrix notation, one can show that 
+
+$$
+s(\boldsymbol\beta) = \boldsymbol{X}^{T} (y-\pi)
+$$
+
+and
+
+$$
+H(\boldsymbol\beta) = - \boldsymbol{X^TWX}~,
+$$
+where $s()$ and $H()$ are the score and hessia matrix, respectively, and $\boldsymbol W$ is a square matrix with $\pi_i (1-\pi_i)$ on its diagonal. 
+
+Thus, in matrix notation, we have
+
+$$
+   \boldsymbol\beta^{i+1} = \boldsymbol\beta^{i} + (\boldsymbol{X^TWX})^{-1}X^T(\boldsymbol{y}-\boldsymbol{\pi})
+$$
+
+The algorithm essencially apply the above formulation until a certain tolerance criterion is reached, such that the difference $\boldsymbol\beta^{i+1} - \boldsymbol\beta^{i}$ is smaller than a chosen tolerance level. The details about the necessary regulariy conditions for convergence is out of the scope of this paper, nonetheless, one should always be aware that the algorithm might never converge or get stuck in a local maximum among other problematic scenarios. 
+
+```{r NRExample, echo=FALSE, fig.cap=cap2, fig.height=2.5, fig.align='center', fig.width=5.5}
+cap2 <- paste("Illustration of the Newton-Rahpson Method.",
+             "\\label{fig:nr}")
+
+cap = ""
+par(mar = c(0,0,0,0))
+curve(x^3, 4, 20, frame.plot = FALSE, xaxt='n', yaxt="n", 
+      ylim = c(-300, 7000),xlab = "",ylab = "",main = "")
+h<-200
+abline(h=h)
+text(6, y = 555, labels = expression(theta[real]), cex = 1)
+dx2x <- deriv(~ x^3, "x")
+x <- 16
+pp <- eval(dx2x)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient") 
+ad <- 1.25
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp, pch=20)
+text(x - 0.5, y = pp + 300, labels = expression("f'"[i]))
+text(x+2, a + (x+2) * b + 1000, labels = "f(x)", cex = 0.8)
+text(x = -a / b + .45, y = -270, labels = expression(hat(theta)[i]))
+x <- (-a + h) / b
+pp <- eval(dx2x)
+lines(x =c(x, x) , y = c(h, pp), lty = 3)
+points(x, h, pch=20)
+points(5.8480, h, pch=20)
+b <- attr(pp, "gradient")
+a <- pp - x * attr(pp,"gradient") 
+ad <- 1.22
+lines(x =c(0, x*ad) , y = c(a, a + x*ad * b))
+points(x, y = pp, pch=20)
+text(x-0.5, y = pp + 300, labels = expression("f'"[1+i]))
+text(x = -a / b + 0.95, y = -270, labels = expression(hat(theta)[i+1]))
+points((-a + h)/b, h, pch=20)
+```
+
+\newpage
+
+# R Implementation 
+
+In this section I will elaborate on the R implementation of the logist regression method as detailed on the previous section. First I will go over the basic usage of the package and afterwards, more detailed over a few aspects.
+
+For this example, I will use the *Donner–Reed Party*[^1] dataset that is included in `package:logitModel`. The data is about the tragic event that occured during the winter of 1846–47 when a group of American pioneers set out to California in a wagon train and got stuck midway in Sierra Nevada. Only aboud half of the party survived to reach California.  
+
+[^1]: A detailed account of the tragic event can be found on <https://en.wikipedia.org/wiki/Donner_Party>
+
+
+### The logitModel function formula interface {-}
+
+Via the formula interface, the user can easily pass the arguments wheter continuous or categorical to the function as it is implemented in other common `R` functions. 
+
+```{r}
+library(logitModel)
+fit <- logitModel(survived ~ age + sex, data = DonnerData)
+```
+
+### The S3 print() Method {-}
+
+The S3 `print()` method mimics the `stats:::print.glm()` output, albeit with changes for a more compact view of the basic results. 
+```{r}
+fit
+```
+
+
+### The S3 summary() Method {-}
+
+Also mimicing the `summary()` output of an glm object, the summary method includes a few other  statistics and information on the model results. The choice was again to portray the results in a bit more compact form, which also makes it possible to include a few other important statistics on the model, such as Baysian Information Criterion (BIC) and the Log-Likelihood value of the full model. 
+
+```{r}
+summary(fit)
+```
+
+### The S3 plot() Method {-}
+
+Also with the intent of improving a little over the `plot.glm()` from the stats package, the `plot()` method, per default, identifies the binary 0 and 1 reponse variable with blue and red colours, respectively. 
+
+```{r}
+op <- par(mfrow = c(2,2))
+plot(fit)
+```
+
+### The S3 pairs() Method {-}
+
+The functionaliy of the S3 `pairs()` method for the logitModel class object can be better demonstrated when modeling a bigger model, that is, with more covariates.  In this case, consider adding the dummy variable *family* into the current model. 
+
+```{r include=FALSE}
+DonnerData$survived[3] <- 0
+```
+```{r}
+fit2 <- logitModel(survived ~ age + sex + family, data = DonnerData)
+pairs(fit2)
+```
+
+Similar to the default `pairs()` method from the `graphics` package that plots all against all variables in order to give the user a quick overview of the data and how each variable interacts with one another. In this implementation, however, all explanoatory variables are plotted against the response variable so that one can visually observe the resulting coefficients of the model. This function could be improved by adding a confidence interval in order to make explicit the degree of uncertainty of each estimated coefficient.
+
+For more information on the dummy variable family, please refer to the help file via `?DonnerData`. 
+
+## Detailed overview of key points of the R implementation
+
+In this section I discuss a few points about the implementation of the logistic regression estimation procedure used in the package based on the Newton-Raphson algorithm. 
+
+### Implementing the Newton-Rahpson Algorithm 
+
+The implemented algorithm can be devided into three sections. First the variables are initiated, then the actual computation is done until convergence or until maximum iteration is reached and then a list of the results is returned. 
+
+```{r, eval = FALSE}
+newtonRaphson <- function(y, X, precision = 1e-7, iterMax = 25) {
+  #01 initiate variables
+  beta <- rep(0, times = ncol(X))
+  i <- 0
+  convergence <- FALSE
+  ...
+```
+
+In the initiation part, the beta vector as well as a iteration counter and a convergence flag is initiated. A better implementation could optmize the algorithm by choosing are better initiating vlaues for beta based on the data at hand. 
+
+```{r eval=FALSE}
+newtonRaphson <- function(y, X, precision = 1e-7, iterMax = 25) {
+
+  beta <- rep(0, times = ncol(X))
+  i <- 0
+  convergence <- FALSE
+
+  while (i <= iterMax & convergence == FALSE) {
+    # update i
+    i <- i + 1
+
+    # calculate probabilities (pi)
+    eta <- X %*% beta
+    pi <- as.numeric(logist(X %*% beta))
+
+    # init / update Matrix W
+
+```
+
+
+
+
+
+\newpage
+
+
+```{r}
+fitGLM <- glm(survived ~ age + sex, data = DonnerData, family = binomial())
+```
+
+# Discussion and Finishing lines
+
+\newpage
+
+# References
+
+# Appendix {-}
+
+Due to naive solution of the Newton-Raphson method, the algorithm does't converge when including *family* in the model, because all members of the Breen family survived. This seems to be the case of *perfect discrimination*, when there is no overlap in the explanatory variables relative to reponse variables being either $0$ or $1$ [see @agresti, p. 195]. That is, for all $y_i = 0$ and $y_i = 1$ observations, there is a $\bar x$ value that divides both set of observations. 
+
+To quickly circumvent this issue, I simply change the surival outcome of one memebr fo the Breen family, so that my implementation could achieve convergence. This is definetelly not a very sophisticated solution, but the only intent was to show the functionality of the `pairs()` method.
+
+
