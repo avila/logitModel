@@ -1,0 +1,6 @@
+"0","cap2 <- paste(""Illustration of the Newton-Rahpson Method."","
+"0","             ""\\label{fig:nr}"")"
+"0","cap = """""
+"0","par(mar = c(0,0,0,0))"
+"0","curve(x^3, 4, 20, frame.plot = FALSE, xaxt='n', yaxt=""n"", "
+"0","      ylim = c(-300, 7000),xlab = """",ylab = """",main = """")"

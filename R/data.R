@@ -1,10 +1,10 @@
 #' Donner Party Dataset
 #'
-#' During the summer of 1846, the 87 members of the Donner Party travelled an
+#' "During the summer of 1846, the 87 members of the Donner Party travelled an
 #' untested route between Fort Bridger, Wyoming, and the Humboldt River, Nevada.
 #' As a result of delays caused by this choice, they became stranded by heavy snows
 #' on the east flank of the Sierra Nevada. By the time the last member of the party
-#' was rescued, 40 had die [Donald K. Grayson, 1990].
+#' was rescued, 40 had died" [Donald K. Grayson, 1990].
 #'
 #' The main families in the Donner party were: Donner, Graves, Breen and Reed.
 #' The families of Murphy, Foster and Pike are grouped as 'MurFosPik', those of

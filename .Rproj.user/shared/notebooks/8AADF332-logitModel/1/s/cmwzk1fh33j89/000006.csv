@@ -1,0 +1,2 @@
+"0","curve(logitModel:::logist(-x), from = -lim, to = lim, "
+"0","      ylab = ""P(Y = 1)"", main = """", xlab = ""x"")"

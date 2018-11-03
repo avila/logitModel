@@ -1,7 +1,7 @@
 #' Alternative Logistic Regression Implementation
 #'
-#' \code{logitModel} computes a logistic regression for a binary response
-#'   variable via \code{\link{newtonRaphson}} estimation method.
+#' \code{logitModel} computes a logistic regression for a binary response variable
+#'    via \code{\link{newtonRaphson}} estimation method.
 #'
 #' @param formula an object of class "formula".
 #' @param data an optional data frame or coercible to one. If empty, the
@@ -12,11 +12,11 @@
 #'
 #' @return \code{logitModel} returns an object of \code{\link[base]{class}}
 #'     \emph{logitModel}, which includes the coefficients, fitted vlaues,
-#'     variance-covariance matrix, residuals, degree of freedom, loglikelihood
-#'     value and deviance (these last three values also from Null model), and
-#'     AIC. A few extra extra inforamtion such as the formula, the function
-#'     call, the response variable and the design matrix, as well as the weight
-#'     matrix and the number of iterations needed for convergence.
+#'     variance-covariance matrix, residuals, degree of freedom (also from Null
+#'     Model), loglikelihood value, deviance (also from Null model), and AIC. A
+#'     few extra extra inforamtion such as the formula, the function call, the
+#'     response variable and the design matrix, as well as the weight matrix and
+#'     the number of iterations needed for convergence.
 #'
 #' @examples
 #' set.seed(42)
@@ -32,7 +32,7 @@ logitModel <- function(formula, data, precision = 1e-10, iterMax = 25) {
   # Initialisation                                                           #
   ############################################################################
 
-  # generate model.frame. If "data" missing, search variables in Parent Env
+  # generate model.frame. If data unused, search variables in Parent Env
   if(missing(data)) {
     modelFrame <- model.frame(formula, data = parent.frame())
   } else {
@@ -107,10 +107,9 @@ logitModel <- function(formula, data, precision = 1e-10, iterMax = 25) {
                  devianceResid = devianceResid,
                  AIC = AIC,
 
-                 # NULL Model
+                 # Restricted Model
                  dfNull = dfNull,
                  devianceNull = devianceNull,
-                 logLikelihoodNull = logLikelihoodNull,
 
                  # Extras
                  formula = formula,
@@ -372,8 +371,8 @@ print.summary.logitModel <- function(model, ...) {
 #' as their generic functions.
 #'
 #' @export
-plot.logitModel <- function(model, which = 1:4, col, ask,
-                            cookLevels = c(.5, 1), ...) {
+plot.logitModel <- function(model, which = 1:4, col, cookLevels = c(.5, 1), ask,
+                          ...) {
 
   # Common Parameters
   oldPar <- par(no.readonly = TRUE)
@@ -550,7 +549,6 @@ pairs.logitModel <- function(model, nRow, single = FALSE,
   oldPar <- par(no.readonly = TRUE)
   on.exit(par(oldPar))
 
-  # get a (more or less) squared layout if missing nRow arg.
   if (missing(nRow)) nRow <- ceiling(sqrt(length(model$coefficients)))
   parCol <- ceiling(length(X) / nRow)
   parRow <- min(nRow, length(X))

@@ -1,0 +1,3 @@
+"0","x <- (-a + h) / b"
+"0","pp <- eval(dx2x)"
+"0","lines(x =c(x, x) , y = c(h, pp), lty = 3)"
